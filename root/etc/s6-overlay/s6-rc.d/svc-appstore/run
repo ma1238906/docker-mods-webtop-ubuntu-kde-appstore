@@ -1,0 +1,9 @@
+#!/command/with-contenv bash
+# 用镜像里现成的用户 abc（uid=1000,gid=1000）
+cd /config/appstore || exit 1
+# 如果依赖没装过就装一次（/config 是持久化目录）
+if [ ! -d .venv ]; then
+    python3 -m venv .venv
+    .venv/bin/pip install -r requirements.txt
+fi
+exec s6-setuidgid abc /config/appstore/.venv/bin/python -u main.py

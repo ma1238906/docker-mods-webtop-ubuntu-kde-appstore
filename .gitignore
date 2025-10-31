@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Envs
+.env
+.env.*
+venv/
+ENV/
+.env.local
+
+# Packaging
+*.egg-info/
+dist/
+build/
+
+# Logs
+*.log
+backend.log
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Node (if any web tooling is added later)
+node_modules/
+
+# Misc
+*.tmp
+*.bak

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>软件安装助手（Web）</title>
+    <style>
+        body { background: #0b1220; color: #e5e7eb; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji"; margin: 0; }
+        .container { max-width: 1000px; margin: 24px auto; padding: 0 16px; }
+        h1 { font-size: 24px; font-weight: 700; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 16px; }
+        .card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 12px; }
+        .card h3 { margin: 8px 0; font-size: 16px; }
+        .status { font-size: 12px; color: #cbd5e1; min-height: 18px; }
+        button { background: #3b82f6; color: #fff; border: 0; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+        button:disabled { background: #475569; color: #cbd5e1; cursor: not-allowed; }
+        #log { background: #0f172a; color: #e5e7eb; border-radius: 8px; padding: 8px; white-space: pre-wrap; min-height: 200px; margin-top: 24px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>选择要安装的软件</h1>
+        <div id="grid" class="grid"></div>
+        <h2 style="margin-top:24px;font-size:18px;">安装日志</h2>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        // 使用同源相对路径（由 FastAPI 提供静态与接口），无需端口拼装
+        const API_BASE = '';
+        const grid = document.getElementById('grid');
+        const logEl = document.getElementById('log');
+        const statusMap = new Map();
+        const btnMap = new Map();
+
+        function appendLog(line){
+            logEl.textContent += line + "\n";
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        async function loadList(){
+            const res = await fetch(`${API_BASE}/api/software`);
+            const data = await res.json();
+            grid.innerHTML = '';
+            for(const item of data.items){
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                const h3 = document.createElement('h3');
+                h3.textContent = item.name || item.key;
+                card.appendChild(h3);
+
+                if (item.iconUrl) {
+                    const img = document.createElement('img');
+                    img.src = item.iconUrl;
+                    img.alt = item.name || item.key;
+                    img.style.width = '72px';
+                    img.style.height = '72px';
+                    img.style.display = 'block';
+                    img.style.margin = '8px auto';
+                    card.appendChild(img);
+                }
+
+                const status = document.createElement('div');
+                status.className = 'status';
+                if(item.installed){
+                    status.textContent = '已安装';
+                }else{
+                    status.textContent = '待安装';
+                }
+                card.appendChild(status);
+                statusMap.set(item.key, status);
+
+                const btn = document.createElement('button');
+                if(item.installed){
+                    btn.textContent = '已安装';
+                    btn.disabled = true;
+                }else{
+                    btn.textContent = '安装';
+                    btn.disabled = false;
+                    btn.onclick = () => startInstall(item.key, item.name || item.key);
+                }
+                btnMap.set(item.key, btn);
+                card.appendChild(btn);
+
+                grid.appendChild(card);
+            }
+        }
+
+        async function startInstall(key, name){
+            const status = statusMap.get(key);
+            const btn = btnMap.get(key);
+            status.textContent = '正在安装...';
+            btn.disabled = true;
+            logEl.textContent = '';
+            try{
+                const res = await fetch(`${API_BASE}/api/install/${encodeURIComponent(key)}`, { method: 'POST' });
+                if(!res.ok){
+                    const err = await res.json().catch(()=>({detail: res.statusText}));
+                    throw new Error(err.detail || '启动失败');
+                }
+            }catch(e){
+                status.textContent = '启动失败';
+                btn.disabled = false;
+                appendLog(`[${name}] 启动失败: ${e.message}`);
+                return;
+            }
+
+            const es = new EventSource(`${API_BASE}/api/install/${encodeURIComponent(key)}/stream`);
+            es.onmessage = (ev) => {
+                appendLog(`[${name}] ${ev.data}`);
+            };
+            es.addEventListener('end', async () => {
+                es.close();
+                const sRes = await fetch(`${API_BASE}/api/software`);
+                const data = await sRes.json();
+                // 自动刷新状态
+                for(const sw of data.items){
+                    const btn = btnMap.get(sw.key);
+                    const status = statusMap.get(sw.key);
+                    if(btn && status){
+                        if(sw.installed){
+                            status.textContent = '已安装';
+                            btn.textContent = '已安装';
+                            btn.disabled = true;
+                        }else{
+                            if(sw.key === key){
+                                status.textContent = '安装成功';
+                            }else{
+                                status.textContent = '待安装';
+                            }
+                            btn.textContent = '安装';
+                            btn.disabled = false;
+                        }
+                    }
+                }
+            });
+            es.onerror = () => {
+                // SSE 中断也尝试查询最终状态
+            };
+        }
+
+        loadList();
+    </script>
+</body>
+</html>
+
+
