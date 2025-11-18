@@ -1,0 +1,5 @@
+{
+    "name": "Miniconda",
+    "requires_root": true,
+    "checkCommand": "bash -lc 'type -p /opt/miniconda/bin/conda &>/dev/null'"
+}

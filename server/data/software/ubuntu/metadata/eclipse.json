@@ -1,0 +1,5 @@
+{
+    "name": "Eclipse",
+    "requires_root": true,
+    "checkCommand": "bash -lc 'type -p eclipse &>/dev/null'"
+}

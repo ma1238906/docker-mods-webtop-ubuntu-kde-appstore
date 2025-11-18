@@ -1,0 +1,5 @@
+{
+    "name": "Miniconda",
+    "requires_root": true,
+    "checkCommand": "which conda"
+}

@@ -1,0 +1,5 @@
+{
+    "name": "JDK",
+    "requires_root": true,
+    "checkCommand": "bash -lc 'type -p java &>/dev/null'"
+}

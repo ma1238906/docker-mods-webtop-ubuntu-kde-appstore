@@ -1,0 +1,5 @@
+{
+    "name": "iptux",
+    "requires_root": true,
+    "checkCommand": "which iptux"
+}

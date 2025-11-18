@@ -1,0 +1,6 @@
+{
+  "name": "VLC",
+  "requires_root": true,
+  "checkCommand": "which vlc"
+}
+

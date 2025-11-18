@@ -1,0 +1,5 @@
+{
+    "name": "金山WPS",
+    "requires_root": true,
+    "checkCommand": "which wps"
+  }

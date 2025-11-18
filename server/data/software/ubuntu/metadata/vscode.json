@@ -1,0 +1,6 @@
+{
+  "name": "VS Code",
+  "requires_root": true,
+  "checkCommand": "which code"
+}
+

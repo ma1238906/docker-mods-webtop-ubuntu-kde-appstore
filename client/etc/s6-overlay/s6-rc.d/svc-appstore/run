@@ -1,0 +1,14 @@
+#!/command/with-contenv bash
+# 软件商店客户端服务启动脚本
+
+cd /app || exit 1
+
+# 如果依赖没装过就装一次
+if [ ! -d /app/.venv ]; then
+    python3 -m venv /app/.venv
+    /app/.venv/bin/pip install --no-cache-dir -r /app/requirements.txt
+fi
+
+# 使用虚拟环境中的 Python 启动服务(需要以root权限启动，否则脚本的下载和执行会失败)
+# exec s6-setuidgid abc /config/.venv/bin/python -u -m server.main
+exec /app/.venv/bin/python -u -m server.main

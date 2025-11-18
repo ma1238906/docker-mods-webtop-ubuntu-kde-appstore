@@ -1,0 +1,5 @@
+{
+    "name": "PyCharm",
+    "requires_root": true,
+    "checkCommand": "bash -lc 'type -p pycharm &>/dev/null'"
+}

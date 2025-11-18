@@ -1,0 +1,6 @@
+{
+  "name": "Google Chrome",
+  "requires_root": true,
+  "checkCommand": "which google-chrome"
+}
+

@@ -1,0 +1,5 @@
+{
+    "name": "MySQL",
+    "requires_root": true,
+    "checkCommand": "which mysql"
+}

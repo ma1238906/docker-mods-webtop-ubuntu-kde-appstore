@@ -1,0 +1,5 @@
+{
+    "name": "IDEA",
+    "requires_root": true,
+    "checkCommand": "bash -lc 'type -p idea &>/dev/null'"
+}

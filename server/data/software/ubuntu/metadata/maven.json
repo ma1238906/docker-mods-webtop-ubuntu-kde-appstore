@@ -1,0 +1,5 @@
+{
+    "name": "Maven",
+    "requires_root": true,
+    "checkCommand": "bash -lc 'type -p mvn &>/dev/null'"
+}

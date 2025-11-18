@@ -1,0 +1,5 @@
+{
+    "name": "Maven",
+    "requires_root": true,
+    "checkCommand": "which maven"
+}   

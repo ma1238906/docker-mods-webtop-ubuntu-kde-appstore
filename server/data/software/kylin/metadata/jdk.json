@@ -1,0 +1,5 @@
+{
+    "name": "JDK",
+    "requires_root": true,
+    "checkCommand": "which jdk"
+}
